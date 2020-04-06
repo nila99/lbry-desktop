@@ -66,6 +66,10 @@
 .card__section--flex {
   @extend .section__flex;
   padding: var(--spacing-medium) var(--spacing-large);
+
+  @media (max-width: $breakpoint-small) {
+    padding: 0;
+  }
 }
 
 .card__actions--inline {
@@ -232,4 +236,9 @@
     margin: 0;
     margin-bottom: var(--spacing-small);
   }
+}
+
+.card__bottom-gutter {
+  @extend .help;
+  margin-top: var(--spacing-medium);
 }
