@@ -100,7 +100,7 @@ function TransactionList(props: Props) {
         <h2 className="main--empty empty">{loading ? __('Loading') : emptyMessage || __('No transactions.')}</h2>
       )}
 
-      {!!transactions && !!transactions.length && <TransactionListTable transactionList={transactions} />}
+      {!!transactions && !!transactions.length && <TransactionListTable transactions={transactions} />}
       {!slim && !!transactionCount && (
         <Paginate
           onPageChange={page => history.replace(`/$/${PAGES.TRANSACTIONS}?page=${Number(page)}`)}

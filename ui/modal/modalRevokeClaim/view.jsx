@@ -7,14 +7,12 @@ import * as txnTypes from 'constants/transaction_types';
 type Props = {
   closeModal: () => void,
   abandonClaim: (string, number) => void,
-  txid: string,
-  nout: number,
-  transactionItems: Array<Transaction>,
+  tx: Txo,
 };
 
 export default function ModalRevokeClaim(props: Props) {
-  const { transactionItems, txid, nout, closeModal } = props;
-  const { type, claim_name: name } = transactionItems.find(claim => claim.txid === txid && claim.nout === nout) || {};
+  const { tx, closeModal, abandonClaim } = props;
+  const { value_type: valueType, type, normalized_name: name, txid, nout } = tx;
   const [channelName, setChannelName] = useState('');
 
   function getButtonLabel(type: string) {
@@ -49,7 +47,11 @@ export default function ModalRevokeClaim(props: Props) {
           </p>
         </React.Fragment>
       );
-    } else if (type === txnTypes.CHANNEL || (type === txnTypes.UPDATE && name.startsWith('@'))) {
+    } else if (
+      valueType === txnTypes.CHANNEL ||
+      type === txnTypes.CHANNEL ||
+      (type === txnTypes.UPDATE && name.startsWith('@'))
+    ) {
       return (
         <React.Fragment>
           <p>
@@ -77,10 +79,8 @@ export default function ModalRevokeClaim(props: Props) {
   }
 
   function revokeClaim() {
-    const { txid, nout } = props;
-
-    props.closeModal();
-    props.abandonClaim(txid, nout);
+    abandonClaim(txid, nout);
+    closeModal();
   }
 
   return (

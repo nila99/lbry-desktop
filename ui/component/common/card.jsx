@@ -10,6 +10,8 @@ import * as ICONS from 'constants/icons';
 type Props = {
   title?: string | Node,
   subtitle?: string | Node,
+  titleActions?: string | Node,
+  headerActions?: string | Node,
   body?: string | Node,
   actions?: string | Node,
   icon?: string,
@@ -23,6 +25,8 @@ export default function Card(props: Props) {
   const {
     title,
     subtitle,
+    titleActions,
+    headerActions,
     body,
     actions,
     icon,
@@ -46,18 +50,22 @@ export default function Card(props: Props) {
               {subtitle && <div className="card__subtitle">{subtitle}</div>}
             </div>
           </div>
-          {expandable && (
-            <div className="section--padded">
-              <Button
-                button={'alt'}
-                aria-label={__('More')}
-                icon={expanded ? toCapitalCase(ICONS.SUBTRACT) : toCapitalCase(ICONS.ADD)}
-                onClick={() => setExpanded(!expanded)}
-              />
-            </div>
-          )}
+          <div>
+            {titleActions && <div className="section--padded">{titleActions}</div>}
+            {expandable && (
+              <div className="section--padded">
+                <Button
+                  button={'alt'}
+                  aria-label={__('More')}
+                  icon={expanded ? toCapitalCase(ICONS.SUBTRACT) : toCapitalCase(ICONS.ADD)}
+                  onClick={() => setExpanded(!expanded)}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
+      {headerActions && <div className="card__header-actions">{headerActions}</div>}
       {(!expandable || (expandable && expanded)) && (
         <>
           {body && (

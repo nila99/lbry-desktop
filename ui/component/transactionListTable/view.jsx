@@ -2,37 +2,32 @@
 import * as MODALS from 'constants/modal_types';
 import React from 'react';
 import TransactionListItem from './internal/transaction-list-item';
+import TxoListItem from './internal/txo-list-item';
 
 type Props = {
   emptyMessage: ?string,
   loading: boolean,
   mySupports: {},
   myClaims: any,
-  openModal: (id: string, { nout: number, txid: string }) => void,
+  openModal: (id: string, { tx: Txo }) => void,
   rewards: {},
-  transactionList: Array<any>,
+  transactions?: Array<Transaction>,
+  txos?: Array<Txo>,
 };
 
 function TransactionListTable(props: Props) {
-  const { emptyMessage, rewards, loading, transactionList } = props;
-
-  function isRevokeable(txid: string, nout: number) {
-    const outpoint = `${txid}:${nout}`;
-    const { mySupports, myClaims } = props;
-
-    return !!mySupports[outpoint] || myClaims.has(outpoint);
-  }
-
-  function revokeClaim(txid: string, nout: number) {
-    props.openModal(MODALS.CONFIRM_CLAIM_REVOKE, { txid, nout });
+  const { emptyMessage, rewards, loading, txos, transactions } = props;
+  const REVOCABLE = ['channel', 'stream', 'repost', 'support', 'claim'];
+  const list = txos || transactions || [];
+  function revokeClaim(tx: any) {
+    props.openModal(MODALS.CONFIRM_CLAIM_REVOKE, { tx });
   }
 
   return (
     <React.Fragment>
-      {!loading && !transactionList.length && (
-        <h2 className="main--empty empty">{emptyMessage || __('No transactions.')}</h2>
-      )}
-      {!!transactionList.length && (
+      {!loading && !list.length && <h2 className="main--empty empty">{emptyMessage || __('No transactions.')}</h2>}
+      {loading && <h2 className="main--empty empty">{__('Loading...')}</h2>}
+      {!loading && !!list.length && (
         <div className="table__wrapper">
           <table className="table table--transactions">
             <thead>
@@ -45,15 +40,24 @@ function TransactionListTable(props: Props) {
               </tr>
             </thead>
             <tbody>
-              {transactionList.map(t => (
-                <TransactionListItem
-                  key={`${t.txid}:${t.nout}`}
-                  transaction={t}
-                  reward={rewards && rewards[t.txid]}
-                  isRevokeable={isRevokeable(t.txid, t.nout)}
-                  revokeClaim={revokeClaim}
-                />
-              ))}
+              {transactions &&
+                transactions.map((t, i) => (
+                  <TransactionListItem
+                    key={`${t.txid}:${t.nout}-${i}`}
+                    transaction={t}
+                    reward={rewards && rewards[t.txid]}
+                  />
+                ))}
+              {txos &&
+                txos.map((t, i) => (
+                  <TxoListItem
+                    key={`${t.txid}:${t.nout}-${i}`}
+                    txo={t}
+                    reward={rewards && rewards[t.txid]}
+                    isRevokeable={t.is_my_output && !t.is_spent && REVOCABLE.includes(t.type)}
+                    revokeClaim={revokeClaim}
+                  />
+                ))}
             </tbody>
           </table>
         </div>
